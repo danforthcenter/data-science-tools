@@ -115,17 +115,25 @@ def main():
                     img_str = zff.read()
 
                     if 'VIS' in image or 'vis' in image:
-                        raw = np.fromstring(img_str, dtype=np.uint8, count=db['vis_height']*db['vis_width'])
-                        raw_img = raw.reshape((db['vis_height'], db['vis_width']))
-                        img = cv2.cvtColor(raw_img, cv2.COLOR_BAYER_RG2BGR)
-                        cv2.imwrite(os.path.join(snapshot_dir, image + ".png"), img)
+                        if len(img_str) == db['vis_height'] * db['vis_width']:
+                            raw = np.fromstring(img_str, dtype=np.uint8, count=db['vis_height']*db['vis_width'])
+                            raw_img = raw.reshape((db['vis_height'], db['vis_width']))
+                            img = cv2.cvtColor(raw_img, cv2.COLOR_BAYER_RG2BGR)
+                            cv2.imwrite(os.path.join(snapshot_dir, image + ".png"), img)
+                            os.remove(local_file)
+                        else:
+                            print("Warning: File {0} containing image {1} seems corrupted.".format(local_file, image))
                     elif 'NIR' in image or 'nir' in image:
-                        raw = np.fromstring(img_str, dtype=np.uint16, count=db['nir_height'] * db['nir_width'])
-                        if np.max(raw) > 4096:
-                            print("Warning: max value for image {0} is greater than 4096.".format(image))
-                        raw_rescale = np.multiply(raw, 16)
-                        raw_img = raw_rescale.reshape((db['nir_height'], db['nir_width']))
-                        cv2.imwrite(os.path.join(snapshot_dir, image + ".png"), raw_img)
+                        if len(img_str) == (db['nir_height'] * db['nir_width']) * 2:
+                            raw = np.fromstring(img_str, dtype=np.uint16, count=db['nir_height'] * db['nir_width'])
+                            if np.max(raw) > 4096:
+                                print("Warning: max value for image {0} is greater than 4096.".format(image))
+                            raw_rescale = np.multiply(raw, 16)
+                            raw_img = raw_rescale.reshape((db['nir_height'], db['nir_width']))
+                            cv2.imwrite(os.path.join(snapshot_dir, image + ".png"), raw_img)
+                            os.remove(local_file)
+                        else:
+                            print("Warning: File {0} containing image {1} seems corrupted.".format(local_file, image))
                     else:
                         raw = np.fromstring(img_str, dtype=np.uint16, count=db['psII_height'] * db['psII_width'])
                         if np.max(raw) > 16384:
@@ -133,9 +141,10 @@ def main():
                         raw_rescale = np.multiply(raw, 4)
                         raw_img = raw_rescale.reshape((db['psII_height'], db['psII_width']))
                         cv2.imwrite(os.path.join(snapshot_dir, image + ".png"), raw_img)
+                        os.remove(local_file)
                     zff.close()
                     zf.close()
-                    os.remove(local_file)
+                    # os.remove(local_file)
         else:
             values.append('')
             total_water_jobs += 1
