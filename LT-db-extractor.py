@@ -123,6 +123,8 @@ def main():
                                 raw = np.fromstring(img_str, dtype=np.uint8, count=db['vis_height']*db['vis_width'])
                                 raw_img = raw.reshape((db['vis_height'], db['vis_width']))
                                 img = cv2.cvtColor(raw_img, cv2.COLOR_BAYER_RG2BGR)
+                                if raw_images[image]['rotate_flip_type'] != 0:
+                                    img = rotate_image(img)
                                 cv2.imwrite(os.path.join(snapshot_dir, image + ".png"), img)
                                 os.remove(local_file)
                             else:
@@ -135,6 +137,8 @@ def main():
                                     print("Warning: max value for image {0} is greater than 4096.".format(image))
                                 raw_rescale = np.multiply(raw, 16)
                                 raw_img = raw_rescale.reshape((db['nir_height'], db['nir_width']))
+                                if raw_images[image]['rotate_flip_type'] != 0:
+                                    raw_img = rotate_image(raw_img)
                                 cv2.imwrite(os.path.join(snapshot_dir, image + ".png"), raw_img)
                                 os.remove(local_file)
                             else:
@@ -146,6 +150,8 @@ def main():
                                 print("Warning: max value for image {0} is greater than 16384.".format(image))
                             raw_rescale = np.multiply(raw, 4)
                             raw_img = raw_rescale.reshape((db['psII_height'], db['psII_width']))
+                            if raw_images[image]['rotate_flip_type'] != 0:
+                                raw_img = rotate_image(raw_img)
                             cv2.imwrite(os.path.join(snapshot_dir, image + ".png"), raw_img)
                             os.remove(local_file)
                         zff.close()
@@ -171,6 +177,20 @@ def main():
     print("Total snapshots = " + str(total_snapshots))
     print("Total water jobs = " + str(total_water_jobs))
     print("Total images = " + str(total_images))
+
+
+def rotate_image(img):
+    """Rotate an image 180 degrees
+
+    :param img: ndarray
+    :return img: ndarray
+    """
+    # Flip vertically
+    img = cv2.flip(img, 1)
+    # Flip horizontally
+    img = cv2.flip(img, 0)
+
+    return img
 
 
 if __name__ == '__main__':
