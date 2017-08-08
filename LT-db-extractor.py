@@ -67,7 +67,7 @@ def main():
                 images[row['snapshot_id']].append(image_name)
             else:
                 images[row['snapshot_id']] = [image_name]
-            raw_images[image_name] = row['raw_image_oid']
+            raw_images[image_name] = {'raw_image_oid': row['raw_image_oid'], 'rotate_flip_type': row['rotate_flip_type']}
 
     # Create SnapshotInfo.csv file
     header = ['experiment', 'id', 'plant barcode', 'car tag', 'timestamp', 'weight before', 'weight after',
@@ -104,8 +104,8 @@ def main():
             for image in images[snapshot_id]:
                 # Copy the raw image to the local directory
                 remote_dir = os.path.join("/data/pgftp", db['database'],
-                                          snapshot['time_stamp'].strftime("%Y-%m-%d"), "blob" + str(raw_images[image]))
-                local_file = os.path.join(snapshot_dir, "blob" + str(raw_images[image]))
+                                          snapshot['time_stamp'].strftime("%Y-%m-%d"), "blob" + str(raw_images[image]['raw_image_oid']))
+                local_file = os.path.join(snapshot_dir, "blob" + str(raw_images[image]['raw_image_oid']))
                 try:
                     sftp.get(remote_dir, local_file)
                 except IOError as e:
@@ -151,6 +151,12 @@ def main():
                         zff.close()
                         zf.close()
                         # os.remove(local_file)
+                    else:
+                        print("Warning: the local file {0} containing image {1} is not a proper zip file.".format(
+                            local_file, image))
+                else:
+                    print("Warning: the local file {0} containing image {1} was not copied correctly.".format(
+                        local_file, image))
         else:
             values.append('')
             total_water_jobs += 1
