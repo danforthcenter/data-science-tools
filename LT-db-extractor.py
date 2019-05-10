@@ -10,7 +10,7 @@ import zipfile
 import paramiko
 import numpy as np
 import cv2
-
+from tqdm import tqdm
 
 def options():
     parser = argparse.ArgumentParser(description='Retrieve data from a LemnaTec database.',
@@ -79,7 +79,7 @@ def main():
     total_water_jobs = 0
     total_images = 0
 
-    for snapshot_id in snapshots.keys():
+    for snapshot_id in tqdm(snapshots.keys()):
         # Reformat the completed field
         # if snapshots[snapshot_id]['completed'] == 't':
         #     snapshots[snapshot_id]['completed'] = 'true'
