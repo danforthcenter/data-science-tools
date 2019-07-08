@@ -154,8 +154,8 @@ def main():
                                 cv2.imwrite(os.path.join(snapshot_dir, image + ".png"), raw_img)
                                 os.remove(local_file)
                             else:
-                                print("Warning: File {0} containing image {1} seems corrupted.".format(local_file,
-                                                                                                       image))
+                                print("Warning: File {0} containing image {1} seems corrupted. Str length = {2}".format(local_file,
+                                                                                                       image, len(img_str)))
                         else:
                             raw = np.fromstring(img_str, dtype=np.uint16, count=db['psII_height'] * db['psII_width'])
                             if np.max(raw) > 16384:
