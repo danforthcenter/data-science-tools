@@ -134,28 +134,32 @@ def main():
                                 print("Warning: File {0} containing image {1} seems corrupted.".format(local_file,
                                                                                                        image))
                         elif 'NIR' in image or 'nir' in image:
-                            if len(img_str) == (db['nir_height'] * db['nir_width']) * 2:
-                                if raw_images[image]['dataformat'] == 4:
-                                    # New NIR camera data format (16-bit)
+                            raw_rescale = None
+                            if raw_images[image]['dataformat'] == 4:
+                                # New NIR camera data format (16-bit)
+                                if len(img_str) == (db['nir_height'] * db['nir_width']) * 2:
                                     raw = np.fromstring(img_str, dtype=np.uint16,
                                                         count=db['nir_height'] * db['nir_width'])
                                     if np.max(raw) > 4096:
                                         print("Warning: max value for image {0} is greater than 4096.".format(image))
                                     raw_rescale = np.multiply(raw, 16)
-                                elif raw_images[image]['dataformat'] == 0:
-                                    # Old NIR camera data format (8-bit)
+                                else:
+                                    print("Warning: File {0} containing image {1} seems corrupted.".format(local_file,
+                                                                                                           image))
+                            elif raw_images[image]['dataformat'] == 0:
+                                # Old NIR camera data format (8-bit)
+                                if len(img_str) == (db['nir_height'] * db['nir_width']):
                                     raw_rescale = np.fromstring(img_str, dtype=np.uint8,
                                                                 count=db['nir_height'] * db['nir_width'])
                                 else:
-                                    print("Warning: File {0} containing image {1} has an unknown dataformat.".format(local_file, image))
+                                    print("Warning: File {0} containing image {1} seems corrupted.".format(local_file,
+                                                                                                           image))
+                            if raw_rescale is not None:
                                 raw_img = raw_rescale.reshape((db['nir_height'], db['nir_width']))
                                 if raw_images[image]['rotate_flip_type'] != 0:
                                     raw_img = rotate_image(raw_img)
                                 cv2.imwrite(os.path.join(snapshot_dir, image + ".png"), raw_img)
                                 os.remove(local_file)
-                            else:
-                                print("Warning: File {0} containing image {1} seems corrupted. Str length = {2}".format(local_file,
-                                                                                                       image, len(img_str)))
                         else:
                             raw = np.fromstring(img_str, dtype=np.uint16, count=db['psII_height'] * db['psII_width'])
                             if np.max(raw) > 16384:
