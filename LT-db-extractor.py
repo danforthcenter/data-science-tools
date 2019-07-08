@@ -147,8 +147,7 @@ def main():
                                     raw_rescale = np.fromstring(img_str, dtype=np.uint8,
                                                                 count=db['nir_height'] * db['nir_width'])
                                 else:
-                                    print("Warning: File {0} containing image {1} seems corrupted.".format(local_file,
-                                                                                                           image))
+                                    print("Warning: File {0} containing image {1} has an unknown dataformat.".format(local_file, image))
                                 raw_img = raw_rescale.reshape((db['nir_height'], db['nir_width']))
                                 if raw_images[image]['rotate_flip_type'] != 0:
                                     raw_img = rotate_image(raw_img)
