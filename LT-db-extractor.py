@@ -59,7 +59,8 @@ def main():
     # Get all image metadata
     images = {}
     raw_images = {}
-    cur.execute("SELECT * FROM snapshot INNER JOIN tiled_image ON snapshot.id = tiled_image.snapshot_id INNER JOIN tile ON tiled_image.id = tile.tiled_image_id")
+    cur.execute("SELECT * FROM snapshot INNER JOIN tiled_image ON snapshot.id = tiled_image.snapshot_id INNER JOIN "
+                "tile ON tiled_image.id = tile.tiled_image_id")
     for row in cur:
         if row['snapshot_id'] in snapshots:
             image_name = row['camera_label'] + '_' + str(row['tiled_image_id']) + '_' + str(row['frame'])
@@ -67,7 +68,8 @@ def main():
                 images[row['snapshot_id']].append(image_name)
             else:
                 images[row['snapshot_id']] = [image_name]
-            raw_images[image_name] = {'raw_image_oid': row['raw_image_oid'], 'rotate_flip_type': row['rotate_flip_type']}
+            raw_images[image_name] = {'raw_image_oid': row['raw_image_oid'],
+                                      'rotate_flip_type': row['rotate_flip_type'], 'dataformat': row['dataformat']}
 
     # Create SnapshotInfo.csv file
     header = ['experiment', 'id', 'plant barcode', 'car tag', 'timestamp', 'weight before', 'weight after',
@@ -104,7 +106,8 @@ def main():
             for image in images[snapshot_id]:
                 # Copy the raw image to the local directory
                 remote_dir = os.path.join("/data/pgftp", db['database'],
-                                          snapshot['time_stamp'].strftime("%Y-%m-%d"), "blob" + str(raw_images[image]['raw_image_oid']))
+                                          snapshot['time_stamp'].strftime("%Y-%m-%d"),
+                                          "blob" + str(raw_images[image]['raw_image_oid']))
                 local_file = os.path.join(snapshot_dir, "blob" + str(raw_images[image]['raw_image_oid']))
                 try:
                     sftp.get(remote_dir, local_file)
@@ -132,10 +135,20 @@ def main():
                                                                                                        image))
                         elif 'NIR' in image or 'nir' in image:
                             if len(img_str) == (db['nir_height'] * db['nir_width']) * 2:
-                                raw = np.fromstring(img_str, dtype=np.uint16, count=db['nir_height'] * db['nir_width'])
-                                if np.max(raw) > 4096:
-                                    print("Warning: max value for image {0} is greater than 4096.".format(image))
-                                raw_rescale = np.multiply(raw, 16)
+                                if raw_images[image]['dataformat'] == 4:
+                                    # New NIR camera data format (16-bit)
+                                    raw = np.fromstring(img_str, dtype=np.uint16,
+                                                        count=db['nir_height'] * db['nir_width'])
+                                    if np.max(raw) > 4096:
+                                        print("Warning: max value for image {0} is greater than 4096.".format(image))
+                                    raw_rescale = np.multiply(raw, 16)
+                                elif raw_images[image]['dataformat'] == 0:
+                                    # Old NIR camera data format (8-bit)
+                                    raw_rescale = np.fromstring(img_str, dtype=np.uint8,
+                                                                count=db['nir_height'] * db['nir_width'])
+                                else:
+                                    print("Warning: File {0} containing image {1} seems corrupted.".format(local_file,
+                                                                                                           image))
                                 raw_img = raw_rescale.reshape((db['nir_height'], db['nir_width']))
                                 if raw_images[image]['rotate_flip_type'] != 0:
                                     raw_img = rotate_image(raw_img)
