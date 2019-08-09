@@ -1,0 +1,7 @@
+{
+  "data_acquisition_path" : "path",
+  "project_data_paths": {
+    "project1": "path",
+    "project2": "path"
+  }
+}
