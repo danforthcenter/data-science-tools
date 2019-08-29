@@ -1,0 +1,7 @@
+{
+  "data_acquisition_path": "bad-path",
+  "sensors": ["vnir", "kinect2"],
+  "project_data_paths": {
+    "project": "project"
+  }
+}

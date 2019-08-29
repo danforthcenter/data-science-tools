@@ -1,0 +1,47 @@
+{
+  "lemnatec_measurement_metadata": {
+    "user_given_metadata": {
+      "experiment title": "",
+      "experiment responsible": "",
+      "project": "",
+      "instrument": "hyperbot",
+      "location": "",
+      "sampleId": "project_test",
+      "sampleValueFreetext": "",
+      "sampleValueSelection": "",
+      "user given plant height [mm]": "111"
+    },
+    "gantry_system_fixed_metadata": {
+      "system manufacturer": "LemnaTec GmbH., 52076 Aachen, Pascalstra?e 59",
+      "LemnaTec Project number": "",
+      "LemnaTecs hyperspectral robot system no": "1",
+      "project responsible": "",
+      "date of installation": ""
+    },
+    "gantry_system_variable_metadata": {
+      "timestamp": "2019.08.08 16:38:20.690",
+      "pos.x [mm]": "-55",
+      "pos.y [mm]": "280.350006",
+      "pos.z [mm]": "249.119995",
+      "pos.a": "-164.910004",
+      "pos.b": "-1.71",
+      "pos.c": "179.020004",
+      "pos.s": "2",
+      "pos.t": "10",
+      "pos.angle [deg]": "0",
+      "halogenLightIsOn": "True",
+      "crosshairIsOn": "False",
+      "kinect fusion scan without sync robot movement": "yes"
+    },
+    "sensor_fixed_metadata": {
+      "sensor manufacturer": "Microsoft",
+      "sensor product name": "Kinect",
+      "sensor serial number": "todo",
+      "sensor description": "RGB, Depth, Fusion",
+      "sensor purpose": "Generate 3D data from motion and general RGB and depth information",
+      "output data format": "PLY 3D mesh, 16bit depth, 24bit RGB",
+      "sensor computer interface": "USB"
+    },
+    "sensor_variable_metadata": {}
+  }
+}

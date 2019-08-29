@@ -1,0 +1,50 @@
+{
+  "lemnatec_measurement_metadata": {
+    "user_given_metadata": {
+      "experiment title": "",
+      "experiment responsible": "",
+      "project": "",
+      "instrument": "hyperbot",
+      "location": "",
+      "sampleId": "none_test",
+      "sampleValueFreetext": "",
+      "sampleValueSelection": "",
+      "user given plant height [mm]": "111"
+    },
+    "gantry_system_fixed_metadata": {
+      "system manufacturer": "LemnaTec GmbH., 52076 Aachen, Pascalstra?e 59",
+      "LemnaTec Project number": "",
+      "LemnaTecs hyperspectral robot system no": "1",
+      "project responsible": "",
+      "date of installation": ""
+    },
+    "gantry_system_variable_metadata": {
+      "timestamp": "2019.08.08 18:38:22.913",
+      "pos.x [mm]": "-55",
+      "pos.y [mm]": "280.350006",
+      "pos.z [mm]": "249.119995",
+      "pos.a": "-164.910004",
+      "pos.b": "-1.71",
+      "pos.c": "179.020004",
+      "pos.s": "2",
+      "pos.t": "10",
+      "pos.angle [deg]": "0",
+      "halogenLightIsOn": "True",
+      "crosshairIsOn": "False",
+      "hyperspec scan with robot movement": "yes",
+      "movement record guid": "36bb8db2-c4ff-4081-bca8-40b8be56ad77_"
+    },
+    "sensor_fixed_metadata": {
+      "sensor manufacturer": "Headwall Scientific",
+      "sensor product name": "VNIR",
+      "sensor serial number": "G4-403",
+      "sensor description": "hyperspectral camera to measure visible near infrared (VNIR) radiation",
+      "sensor purpose": "measures spectral reflectance from 380nm to 1000nm"
+    },
+    "sensor_variable_metadata": {
+      "current setting frameperiod [ms]": "100",
+      "current setting exposure [ms]": "35",
+      "current setting createdatacube": "1"
+    }
+  }
+}
