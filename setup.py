@@ -33,8 +33,8 @@ setuptools.setup(
     url='',
 
     # Author details
-    author='',
-    author_email='',
+    author='Noah Fahlgren',
+    author_email='nfahlgren@danforthcenter.org',
 
     # Choose your license
     license='MIT',
@@ -90,7 +90,7 @@ setuptools.setup(
     # },
     setup_requires=["pytest-runner"],
     tests_require=['pytest'],
-    scripts=[]
+    scripts=["hyperbot-data-manager.py"]
 
     # If there are data files included in your packages that need to be
     # installed, specify them here.  If using Python 2.6 or less, then these
