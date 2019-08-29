@@ -1,5 +1,6 @@
 {
   "data_acquisition_path" : "path",
+  "sensors": ["vnir", "kinect2"],
   "project_data_paths": {
     "project1": "path",
     "project2": "path"
