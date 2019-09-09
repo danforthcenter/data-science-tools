@@ -4,11 +4,11 @@
 
 A collection of Data Science Facility tools for data management and other tasks.
 
-** Introduction **
+**Introduction**
 
 This tool has been written to replace [PhenoFront](https://github.com/danforthcenter/PhenoFront) and allow a user to connect to a LemnaTec database and download snapshots without the requirement to use LemnaTec software.
 
-** Instructions **
+**Instructions**
 
 1. Open database.example-config and adjust parameters in the JSON file to suit your set-up. Save with a new name.
 
