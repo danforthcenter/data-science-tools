@@ -11,7 +11,6 @@ import paramiko
 import numpy as np
 import cv2
 import datetime
-import fnmatch
 from tqdm import tqdm
 
 def options():
@@ -114,7 +113,7 @@ def main():
 
             for image in images[snapshot_id]:
                 # Copy the raw image to the local directory
-                remote_dir = os.path.join(db['path'], db['database'],
+                remote_dir = os.path.join("/data0/pgftp", db['database'],
                                           snapshot['time_stamp'].strftime("%Y-%m-%d"),
                                           "blob" + str(raw_images[image]['raw_image_oid']))
                 local_file = os.path.join(snapshot_dir, "blob" + str(raw_images[image]['raw_image_oid']))
@@ -177,7 +176,7 @@ def main():
                                 if raw_images[image]['rotate_flip_type'] != 0:
                                     raw_img = rotate_image(raw_img)
                                 cv2.imwrite(os.path.join(snapshot_dir, image + ".png"), raw_img)
-                                os.remove(local_file)
+                                #os.remove(local_file)
                         else:
                             raw = np.frombuffer(img_str, dtype=np.uint16, count=db['psII_height'] * db['psII_width'])
                             if np.max(raw) > 16384:
@@ -187,10 +186,10 @@ def main():
                             if raw_images[image]['rotate_flip_type'] != 0:
                                 raw_img = rotate_image(raw_img)
                             cv2.imwrite(os.path.join(snapshot_dir, image + ".png"), raw_img)
-                            os.remove(local_file)
+                            #os.remove(local_file)
                         zff.close()
                         zf.close()
-                        #os.remove(local_file)
+                        # os.remove(local_file)
                     else:
                         print("Warning: the local file {0} containing image {1} is not a proper zip file.".format(
                             local_file, image))
@@ -214,16 +213,6 @@ def main():
     print("Total water jobs = " + str(total_water_jobs))
     print("Total images = " + str(total_images))
 
-    #Delete files
-    # Get a list of all files in directory
-    for rootDir, subdirs, filenames in os.walk(args.outdir):
-        # Find the files that matches the given patterm
-        for filename in fnmatch.filter(filenames, 'blob*'):
-            try:
-                os.remove(os.path.join(rootDir, filename))
-            except OSError:
-                print("Error while deleting file")
-
 
 def rotate_image(img):
     """Rotate an image 180 degrees
@@ -237,6 +226,14 @@ def rotate_image(img):
     img = cv2.flip(img, 0)
 
     return img
+
+def delete_blobs():
+
+    delete_blob = os.listdir(args.outdir)
+
+    for item in delete_blob:
+        if item.startswith("blob"):
+            os.remove(os.path.join(args.outdir, item))
 
 if __name__ == '__main__':
     main()
