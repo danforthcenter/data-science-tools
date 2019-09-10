@@ -4,6 +4,7 @@
   "hostname" : "hostname",
   "database" : "dbname",
   "path" : "/path/on/lemnatec/server",
+  "colour" : 48,
   "vis_height" : 2056,
   "vis_width" : 2454,
   "nir_height" : 508,
