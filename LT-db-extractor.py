@@ -51,7 +51,7 @@ def main():
     now = datetime.datetime.now()
     time = now.strftime("%Y%m%d%H%M%S")
 
-    # Create the SnapshotInfo.csv file
+    # Create the SnapshotInfo csv file (with experiment and time information in file name)
     csv = open(os.path.join(args.outdir, args.exper+"_SnapshotInfo_"+time+".csv"), "w")
 
     # Connect to the LemnaTec database
