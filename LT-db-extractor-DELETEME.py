@@ -143,100 +143,10 @@ def main():
                             if len(img_str) == db['vis_height'] * db['vis_width']:
                                 raw = np.frombuffer(img_str, dtype=np.uint8, count=db['vis_height']*db['vis_width'])
                                 raw_img = raw.reshape((db['vis_height'], db['vis_width']))
-                                img = cv2.cvtColor(raw_img, db['colour'])
-                                if raw_images[image]['rotate_flip_type'] != 0:
-                                    img = rotate_image(img)
-                                cv2.imwrite(os.path.join(snapshot_dir, image + ".png"), img)
-                                #os.remove(local_file)
-                            else:
-                                print("Warning: File {0} containing image {1} seems corrupted.".format(local_file,
-                                                                                                       image))
-                        elif 'NIR' in image or 'nir' in image:
-                            raw_rescale = None
-                            if raw_images[image]['dataformat'] == 4:
-                                # New NIR camera data format (16-bit)
-                                if len(img_str) == (db['nir_height'] * db['nir_width']) * 2:
-                                    raw = np.frombuffer(img_str, dtype=np.uint16,
-                                                        count=db['nir_height'] * db['nir_width'])
-                                    if np.max(raw) > 4096:
-                                        print("Warning: max value for image {0} is greater than 4096.".format(image))
-                                    raw_rescale = np.multiply(raw, 16)
-                                else:
-                                    print("Warning: File {0} containing image {1} seems corrupted.".format(local_file,
-                                                                                                           image))
-                            elif raw_images[image]['dataformat'] == 0:
-                                # Old NIR camera data format (8-bit)
-                                if len(img_str) == (db['nir_height'] * db['nir_width']):
-                                    raw_rescale = np.frombuffer(img_str, dtype=np.uint8,
-                                                                count=db['nir_height'] * db['nir_width'])
-                                else:
-                                    print("Warning: File {0} containing image {1} seems corrupted.".format(local_file,
-                                                                                                           image))
-                            if raw_rescale is not None:
-                                raw_img = raw_rescale.reshape((db['nir_height'], db['nir_width']))
-                                if raw_images[image]['rotate_flip_type'] != 0:
-                                    raw_img = rotate_image(raw_img)
-                                cv2.imwrite(os.path.join(snapshot_dir, image + ".png"), raw_img)
-                                os.remove(local_file)
-                        else:
-                            raw = np.frombuffer(img_str, dtype=np.uint16, count=db['psII_height'] * db['psII_width'])
-                            if np.max(raw) > 16384:
-                                print("Warning: max value for image {0} is greater than 16384.".format(image))
-                            raw_rescale = np.multiply(raw, 4)
-                            raw_img = raw_rescale.reshape((db['psII_height'], db['psII_width']))
-                            if raw_images[image]['rotate_flip_type'] != 0:
-                                raw_img = rotate_image(raw_img)
-                            cv2.imwrite(os.path.join(snapshot_dir, image + ".png"), raw_img)
-                            os.remove(local_file)
-                        zff.close()
-                        zf.close()
-                        #os.remove(local_file)
-                    else:
-                        print("Warning: the local file {0} containing image {1} is not a proper zip file.".format(
-                            local_file, image))
-                else:
-                    print("Warning: the local file {0} containing image {1} was not copied correctly.".format(
-                        local_file, image))
-        else:
-            values.append('')
-            total_water_jobs += 1
-
-        csv.write(','.join(map(str, values)) + '\n')
-
-    #Close everything
-    cur.close()
-    conn.close()
-    sftp.close()
-    ssh.close()
-
-    #Print report
-    print("Total snapshots = " + str(total_snapshots))
-    print("Total water jobs = " + str(total_water_jobs))
-    print("Total images = " + str(total_images))
-
-    #Delete blob files
-    # Get a list of all files in directory
-    for rootDir, subdirs, filenames in os.walk(args.outdir):
-        # Find the files that matches the given patterm
-        for filename in fnmatch.filter(filenames, 'blob*'):
-            try:
-                os.remove(os.path.join(rootDir, filename))
-            except OSError:
-                print("Error while deleting file")
-
-
-def rotate_image(img):
-    """Rotate an image 180 degrees
-
-    :param img: ndarray
-    :return img: ndarray
-    """
-    # Flip vertically
-    img = cv2.flip(img, 1)
-    # Flip horizontally
-    img = cv2.flip(img, 0)
-
-    return img
+                                colour = db['colour']
+                                colour_int = int(colour)
+                                print("Colour: " + colour)
+                                exit()
 
 if __name__ == '__main__':
     main()

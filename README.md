@@ -10,7 +10,7 @@ This tool has been written to replace [PhenoFront](https://github.com/danforthce
 
 **Instructions**
 
-1. Open database.example-config and adjust parameters in the JSON file to suit your set-up. Save with a new name.
+1. Open database.example-config and adjust parameters in the JSON file to suit your set-up. Save this file with a new name (eg: database.config.file). Note: the parameter `"Colour"` describes the colour conversion process that is required. This has an `int code`, which can be obtained from the [OpenCV Colour Space Conversions list](https://docs.opencv.org/4.0.0/d8/d01/group__imgproc__color__conversions.html). For instance, the code for `COLOR_BAYER_RG2BGR` is `48`.
 
 2. Open the command prompt and run `LT-db-extractor.py` with the config file as input (`-c`) and specify an output directory (`-o`) plus experiment (`-e`, your `measurement_label`) to query. For example: `C:/path/to/data-science-tools/LT-db-extractor.py -c T:/path/to/database.config.file -o T:/path/to/my/output/experiment47 -e "Experiment47"`. The script will connect to the database server to query image and experimental metadata. It identifies raw LemnaTec images (in RAWX format) and transfers them to the local machine via SFTP, then it converts them to PNG files. Metadata will be saved to a CSV. Downloaded blob files will be deleted.
 
