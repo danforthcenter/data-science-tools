@@ -139,7 +139,7 @@ def main():
                         zff = zf.open("data")
                         img_str = zff.read()
 
-                        if 'VIS' in image or 'vis' in image or 'TV' in image:
+                        if 'VIS' in image or 'vis' in image or 'TV' in image or 'deg' in image:
                             if len(img_str) == db['vis_height'] * db['vis_width']:
                                 raw = np.frombuffer(img_str, dtype=np.uint8, count=db['vis_height']*db['vis_width'])
                                 raw_img = raw.reshape((db['vis_height'], db['vis_width']))
