@@ -153,17 +153,6 @@ def main():
                                 img = cv2.cvtColor(raw_img, db['colour'])
                                 if raw_images[image]['rotate_flip_type'] != 0:
                                     img = rotate_image(img)
-
-                                # Time format fix for renaming output PNG files
-                                #lt_time = str(row['time_stamp'])
-                                #lt_time_format = "%Y-%m-%d %H:%M:%S.%f%z"
-                                #lt_time_convert = datetime.datetime.strptime(lt_time, lt_time_format)
-                                #lt_time_neat = datetime.datetime.strftime(lt_time_convert, '%Y-%m-%d %H-%M-%S')
-                                #label = str(raw_img[image]['rotate_flip_type'])
-                                #print(label)
-                                #img_file = row['id_tag'] + '_' + lt_time_neat + '_' + row['measurement_label'] + '_' + raw_images[img]['camera_label'] + '_' + str(row['car_tag']) + '_' + str(row['tiled_image_id']) 
-
-                                # Name output images
                                 cv2.imwrite(os.path.join(snapshot_dir, image + ".png"), img)
                                 #os.remove(local_file)
                             else:
