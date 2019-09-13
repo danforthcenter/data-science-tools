@@ -65,6 +65,12 @@ def main():
     for row in cur:
         snapshots[row['id']] = row
 
+    # Fix LemnaTec database time format for renaming output PNG files (ie: remove microseconds and UTC correction)
+    lt_time = str(row['time_stamp'])
+    lt_time_format = "%Y-%m-%d %H:%M:%S.%f%z"
+    lt_time_convert = datetime.datetime.strptime(lt_time, lt_time_format)
+    lt_time_neat = datetime.datetime.strftime(lt_time_convert, '%Y-%m-%d %H-%M-%S')
+
     # Get all image metadata
     images = {}
     raw_images = {}
@@ -72,7 +78,7 @@ def main():
                 "tile ON tiled_image.id = tile.tiled_image_id")
     for row in cur:
         if row['snapshot_id'] in snapshots:
-            image_name = row['camera_label'] + '_' + str(row['tiled_image_id']) + '_' + str(row['frame'])
+            image_name = row['id_tag'] + '_' + lt_time_neat + '_' + row['measurement_label'] + '_' + row['camera_label'] + '_' + str(row['tiled_image_id']) + '_' + str(row['frame'])
             if row['snapshot_id'] in images:
                 images[row['snapshot_id']].append(image_name)
             else:
@@ -140,12 +146,24 @@ def main():
                         img_str = zff.read()
 
                         if 'VIS' in image or 'vis' in image or 'TV' in image or 'deg' in image:
+
                             if len(img_str) == db['vis_height'] * db['vis_width']:
                                 raw = np.frombuffer(img_str, dtype=np.uint8, count=db['vis_height']*db['vis_width'])
                                 raw_img = raw.reshape((db['vis_height'], db['vis_width']))
                                 img = cv2.cvtColor(raw_img, db['colour'])
                                 if raw_images[image]['rotate_flip_type'] != 0:
                                     img = rotate_image(img)
+
+                                # Time format fix for renaming output PNG files
+                                #lt_time = str(row['time_stamp'])
+                                #lt_time_format = "%Y-%m-%d %H:%M:%S.%f%z"
+                                #lt_time_convert = datetime.datetime.strptime(lt_time, lt_time_format)
+                                #lt_time_neat = datetime.datetime.strftime(lt_time_convert, '%Y-%m-%d %H-%M-%S')
+                                #label = str(raw_img[image]['rotate_flip_type'])
+                                #print(label)
+                                #img_file = row['id_tag'] + '_' + lt_time_neat + '_' + row['measurement_label'] + '_' + raw_images[img]['camera_label'] + '_' + str(row['car_tag']) + '_' + str(row['tiled_image_id']) 
+
+                                # Name output images
                                 cv2.imwrite(os.path.join(snapshot_dir, image + ".png"), img)
                                 #os.remove(local_file)
                             else:
