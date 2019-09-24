@@ -20,6 +20,9 @@ def options():
     parser.add_argument("-c", "--config", help="JSON config file.", required=True)
     parser.add_argument("-e", "--exper", help="Experiment number (measurement label)", required=True)
     parser.add_argument("-o", "--outdir", help="Output directory for results.", required=True)
+    parser.add_argument("-a", "--date1", help="Date for start of data series (YYYY-mm-dd).", required=False)
+    parser.add_argument("-z", "--date2", help="Date for end of data series (YYYY-mm-dd).", required=False)
+
     args = parser.parse_args()
 
     # Try to make output directory, throw an error and quit if it already exists.
@@ -36,10 +39,26 @@ def main():
 
     # Read the database connetion configuration file
     config = open(args.config, 'r')
+
     # Load the JSON configuration data
     db = json.load(config)
+    
     #Load the experiment number
     exp = "'"+ args.exper + "'"
+
+    #Load date range (if applicable)
+
+    if args.date1 is not None and args.date2 is not None:
+        date_start = "'"+ args.date1 + "'"
+        date_end = "'"+ args.date2 + "'"
+        print("Preparing to download snapshots between " + args.date1 + " and " + args.date2 + "...")
+    elif args.date1 is not None and args.date2 is None: 
+            try: print(x)
+            except NameError:
+                print("Please enter a valid start date (-a) and end date (-z) in the format YYYY-mm-DD.")
+                quit()
+    else: 
+        print("Preparing to download snapshots...")
 
     # SSH connection
     ssh = paramiko.SSHClient()
@@ -60,7 +79,11 @@ def main():
 
     # Get all snapshots
     snapshots = {}
-    sql_command = str("SELECT * FROM snapshot WHERE measurement_label = " + str(exp))
+
+    if args.date1 is not None and args.date2 is not None:
+        sql_command = str("SELECT * FROM snapshot WHERE measurement_label = " + str(exp) + " AND time_stamp >= " + str(date_start) + "AND time_stamp <= " + str(date_end))
+    else: sql_command = str("SELECT * FROM snapshot WHERE measurement_label = " + str(exp))
+
     cur.execute(sql_command)
     for row in cur:
         snapshots[row['id']] = row
