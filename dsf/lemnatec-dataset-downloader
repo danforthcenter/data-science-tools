@@ -1,0 +1,44 @@
+#!/usr/bin/env python
+
+import argparse
+from dsf.data import lemnatec
+
+
+def options():
+    parser = argparse.ArgumentParser(description='Retrieve data from a LemnaTec database.',
+                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument("-c", "--config", help="JSON config file.", required=True)
+    parser.add_argument("-o", "--outdir", help="Output directory for results.", required=True)
+    args = parser.parse_args()
+
+    return args
+
+
+def main():
+    # Read user options
+    args = options()
+
+    # Read the database connetion configuration file
+    config = lemnatec.load_config(filename=args.config)
+
+    # Open an SFTP connection to the database server
+    sftp = lemnatec.open_sftp_connection(config=config)
+
+    # Open a database connection to the PostgreSQL server
+    db = lemnatec.open_database_connection(config=config)
+
+    # Initialize the dataset directory if it does not exist
+    lemnatec.init_dataset(dataset_dir=args.outdir)
+
+    # Load the dataset metadata
+    meta = lemnatec.load_dataset(dataset_dir=args.outdir)
+
+    # Close the SFTP connection
+    sftp.close()
+
+    # Close the database connection
+    db.close()
+
+
+if __name__ == "__main__":
+    main()
