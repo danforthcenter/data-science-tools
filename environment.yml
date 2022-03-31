@@ -1,0 +1,16 @@
+# run: conda env create --file environment.yml
+# optionally, change channel name with -n {ds}
+name: ds
+dependencies:
+  - python
+  - numpy
+  - opencv
+  - paramiko
+  - psycopg2
+  - tqdm
+  - nb_conda
+  - jupyterlab
+  - pytest
+channels:
+  - conda-forge
+  - defaults
