@@ -5,12 +5,12 @@ import psycopg2.extras
 import argparse
 import json
 import os
-import sys
 import zipfile
 import paramiko
 import numpy as np
 import cv2
 from tqdm import tqdm
+
 
 def options():
     parser = argparse.ArgumentParser(description='Retrieve data from a LemnaTec database.',
