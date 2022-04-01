@@ -26,7 +26,16 @@ def query_snapshots(db, metadata, experiment):
         snapshot = f"snapshot{row['id']}"
         # If the snapshot has not been recorded in the dataset metadata add an empty record
         if snapshot not in metadata:
-            meta[snapshot] = {}
+            meta[snapshot] = {
+                "barcode": row["id_tag"],
+                "cartag": row["car_tag"],
+                "timestamp": row["time_stamp"].strftime("%Y-%m-%d_%H:%M:%S.%f"),
+                "weight_before": row["weight_before"],
+                "weight_after": row["weight_after"],
+                "water_amount": row["water_amount"],
+                "completed": row["completed"],
+                "images": {}
+            }
 
     return meta
 
@@ -58,15 +67,8 @@ def query_images(db, metadata, experiment):
         if snapshot_id in metadata:
             # Construct the image filename
             image_name = f"{row['camera_label']}_{row['tiled_image_id']}_{row['frame']}.png"
-            if image_name not in metadata[snapshot_id]:
-                meta[snapshot_id][image_name] = {
-                    "barcode": row["id_tag"],
-                    "cartag": row["car_tag"],
-                    "timestamp": row["time_stamp"].strftime("%Y-%m-%d_%H:%M:%S.%f"),
-                    "weight_before": row["weight_before"],
-                    "weight_after": row["weight_after"],
-                    "water_amount": row["water_amount"],
-                    "completed": row["completed"],
+            if image_name not in metadata[snapshot_id]["images"]:
+                meta[snapshot_id]["images"][image_name] = {
                     "camera_label": row["camera_label"],
                     "tiled_image_id": row["tiled_image_id"],
                     "frame": row["frame"],

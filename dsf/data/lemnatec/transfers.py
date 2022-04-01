@@ -20,30 +20,30 @@ def transfer_images(metadata, sftp, dataset_dir, config):
     :param config: dsf.data.lemnatec.config.Config
     """
     for snapshot in metadata:
-        # Snapshot directory path
-        snapshot_dir = os.path.join(dataset_dir, snapshot)
-        # Make the snapshot directory if it does not exist
-        os.makedirs(snapshot_dir, exist_ok=True)
-        # Loop over each image in the snapshot
-        for image in metadata[snapshot]:
-            # Image local path
-            imgpath = os.path.join(snapshot_dir, image)
-            # If the image does not exist we will transfer the raw image
-            if not os.path.exists(imgpath):
-                raw_img = f"blob{metadata[snapshot][image]['raw_image_oid']}"
-                local_path = os.path.join(snapshot_dir, raw_img)
-                date_path = datetime.strptime(metadata[snapshot][image]["timestamp"],
-                                              "%Y-%m-%d_%H:%M:%S.%f").strftime("%Y-%m-%d")
-                remote_path = os.path.join("/data/pgftp", config.database, date_path, raw_img)
-                _transfer_raw_image(sftp=sftp, remote_path=remote_path, local_path=local_path)
-                img = _convert_raw_to_png(raw=local_path,
-                                          height=metadata[snapshot][image]["height"],
-                                          width=metadata[snapshot][image]["width"],
-                                          dtype=config.dataformat[metadata[snapshot][image]["dataformat"]]["datatype"],
-                                          imgtype=config.dataformat[metadata[snapshot][image]["dataformat"]]["imgtype"],
-                                          flip=metadata[snapshot][image]["rotate_flip_type"])
-                cv2.imwrite(imgpath, img)
-                os.remove(local_path)
+        # We only need to transfer images if the snapshot contains images
+        if len(metadata[snapshot]["images"]) > 0:
+            # Snapshot directory path
+            snapshot_date = datetime.strptime(metadata[snapshot]["timestamp"], "%Y-%m-%d_%H:%M:%S.%f").strftime("%Y-%m-%d")
+            snapshot_dir = os.path.join(dataset_dir, snapshot_date, snapshot)
+            # Make the snapshot directory if it does not exist
+            os.makedirs(snapshot_dir, exist_ok=True)
+            # Loop over each image in the snapshot
+            for image in metadata[snapshot]["images"]:
+                # Image local path
+                imgpath = os.path.join(snapshot_dir, image)
+                # If the image does not exist we will transfer the raw image
+                if not os.path.exists(imgpath):
+                    raw_img = f"blob{metadata[snapshot]['images'][image]['raw_image_oid']}"
+                    local_path = os.path.join(snapshot_dir, raw_img)
+                    remote_path = os.path.join("/data/pgftp", config.database, snapshot_date, raw_img)
+                    _transfer_raw_image(sftp=sftp, remote_path=remote_path, local_path=local_path)
+                    img_metadata = metadata[snapshot]["images"][image]
+                    img = _convert_raw_to_png(raw=local_path, height=img_metadata["height"], width=img_metadata["width"],
+                                              dtype=config.dataformat[img_metadata["dataformat"]]["datatype"],
+                                              imgtype=config.dataformat[img_metadata["dataformat"]]["imgtype"],
+                                              flip=img_metadata["rotate_flip_type"])
+                    cv2.imwrite(imgpath, img)
+                    os.remove(local_path)
 
 
 def _transfer_raw_image(sftp, remote_path, local_path):
