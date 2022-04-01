@@ -1,6 +1,6 @@
 import paramiko
-import psycopg2
-import psycopg2.extras
+import psycopg
+from psycopg.rows import dict_row
 
 
 def open_sftp_connection(config):
@@ -39,10 +39,10 @@ def open_database_connection(config):
     :return db: psycopg2.extras.DictCursor
     """
     # Connect to the LemnaTec database
-    conn = psycopg2.connect(host=config.hostname,
-                            user=config.username,
-                            password=config.password,
-                            database=config.database)
-    db = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    conn = psycopg.connect(host=config.hostname,
+                           user=config.username,
+                           password=config.password,
+                           dbname=config.database)
+    db = conn.cursor(row_factory=dict_row)
 
     return db
