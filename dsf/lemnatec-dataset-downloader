@@ -7,6 +7,8 @@ from dsf.data import lemnatec
 def options():
     parser = argparse.ArgumentParser(description='Retrieve data from a LemnaTec database.',
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument("-e", "--exp", help="Experiment name/Measurement label.", required=True)
+    parser.add_argument("-d", "--db", help="Database name.", required=True)
     parser.add_argument("-c", "--config", help="JSON config file.", required=True)
     parser.add_argument("-o", "--outdir", help="Output directory for results.", required=True)
     args = parser.parse_args()

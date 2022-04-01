@@ -1,27 +1,27 @@
 from copy import deepcopy
 
 
-def query_snapshots(db, config, metadata):
+def query_snapshots(db, metadata, experiment):
     """Query the database to retrieve all snapshot records.
 
     Keyword arguments:
     db = Database cursor object.
-    config = Instance of the class Config.
     metadata = Dataset metadata.
+    experiment = Experiment/Measurement label.
 
     Returns:
     meta = Updated dataset metadata
 
     :param db: psycopg2.extras.DictCursor
-    :param config: dsf.data.lemnatec.config.Config
     :param metadata: dict
+    :param experiment: str
     :return meta: dict
     """
     # Make a deep copy of the input dictionary
     meta = deepcopy(metadata)
 
     # Query the database to retrieve all snapshot records for the given experiment
-    db.execute("SELECT * FROM snapshot WHERE measurement_label = %s;", [config.experiment])
+    db.execute("SELECT * FROM snapshot WHERE measurement_label = %s;", [experiment])
     for row in db:
         snapshot = f"snapshot{row['id']}"
         # If the snapshot has not been recorded in the dataset metadata add an empty record
@@ -31,27 +31,27 @@ def query_snapshots(db, config, metadata):
     return meta
 
 
-def query_images(db, config, metadata):
+def query_images(db, metadata, experiment):
     """Query the database to retrieve all image records.
 
     Keyword arguments:
     db = Database cursor object.
-    config = Instance of the class Config.
     metadata = Dataset metadata.
+    experiment = Experiment/Measurement label.
 
     Returns:
     meta = Updated dataset metadata
 
     :param db: psycopg2.extras.DictCursor
-    :param config: dsf.data.lemnatec.config.Config
     :param metadata: dict
+    :param experiment: str
     :return meta: dict
     """
     # Make a deep copy of the input dictionary
     meta = deepcopy(metadata)
     # Query the database to retrieve all image records
     db.execute("SELECT * FROM snapshot INNER JOIN tiled_image ON snapshot.id = tiled_image.snapshot_id INNER JOIN "
-               "tile ON tiled_image.id = tile.tiled_image_id WHERE measurement_label = %s;", [config.experiment])
+               "tile ON tiled_image.id = tile.tiled_image_id WHERE measurement_label = %s;", [experiment])
     for row in db:
         # If the image snapshot ID is in metadata then it belongs in this dataset
         snapshot_id = f"snapshot{row['snapshot_id']}"
@@ -72,6 +72,8 @@ def query_images(db, config, metadata):
                     "frame": row["frame"],
                     "raw_image_oid": row["raw_image_oid"],
                     "rotate_flip_type": row["rotate_flip_type"],
-                    "dataformat": row["dataformat"]
+                    "dataformat": str(row["dataformat"]),
+                    "width": row["width"],
+                    "height": row["height"]
                 }
     return meta

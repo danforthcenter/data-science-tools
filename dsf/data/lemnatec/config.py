@@ -8,11 +8,11 @@ class Config:
     username: str
     password: str
     hostname: str
-    database: str
-    experiment: str
+    dataformat: dict
+    database: str = ""
 
 
-def load_config(filename: str) -> Config:
+def load_config(filename: str, database: str) -> Config:
     """Load configuration settings from a JSON file.
 
     Keyword arguments:
@@ -30,6 +30,6 @@ def load_config(filename: str) -> Config:
         config = Config(username=settings["username"],
                         password=settings["password"],
                         hostname=settings["hostname"],
-                        database=settings["database"],
-                        experiment=settings["experiment"])
+                        dataformat=settings["dataformat"],
+                        database=database)
         return config
