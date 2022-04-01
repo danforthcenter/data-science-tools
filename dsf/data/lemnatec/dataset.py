@@ -19,7 +19,7 @@ def init_dataset(dataset_dir):
     # If the metadata file does not exist create an empty JSON file
     if not os.path.exists(metadata_file):
         with open(metadata_file, "w") as fp:
-            json.dump(metadata, fp)
+            json.dump(metadata, fp, indent=4)
 
 
 def load_dataset(dataset_dir):
@@ -50,4 +50,4 @@ def save_dataset(dataset_dir, metadata):
     :param metadata: dict
     """
     with open(os.path.join(dataset_dir, "metadata.json"), "w") as fp:
-        json.dump(metadata, fp)
+        json.dump(metadata, fp, indent=4)
