@@ -4,6 +4,8 @@ from datetime import datetime
 import numpy as np
 import cv2
 from tqdm import tqdm
+import math
+import sys
 
 
 def transfer_images(metadata, sftp, dataset_dir, config):
@@ -43,8 +45,11 @@ def transfer_images(metadata, sftp, dataset_dir, config):
                                               dtype=config.dataformat[img_metadata["dataformat"]]["datatype"],
                                               imgtype=config.dataformat[img_metadata["dataformat"]]["imgtype"],
                                               flip=img_metadata["rotate_flip_type"])
-                    cv2.imwrite(imgpath, img)
-                    os.remove(local_path)
+                    if img is not False:
+                        cv2.imwrite(imgpath, img)
+                        os.remove(local_path)
+                    else:
+                        print(f"Warning: the raw file {local_path} containing image {image} is corrupted.", file=sys.stderr)
 
 
 def _transfer_raw_image(sftp, remote_path, local_path):
@@ -83,13 +88,16 @@ def _convert_raw_to_png(raw, height, width, dtype, imgtype, flip):
         with zf.open("data") as fp:
             # Raw image data as a string
             img_str = fp.read()
-            raw = np.fromstring(img_str, dtype=dtype, count=height * width)
-            img = raw.reshape((height, width))
-            if imgtype == "color":
-                img = cv2.cvtColor(img, cv2.COLOR_BAYER_RG2BGR)
-            if flip != 0:
-                img = _rotate_image(img)
-            return img
+            # Do a QC check before attempting to convert from raw
+            if _raw_qc(img_str=img_str, height=height, width=width):
+                raw = np.fromstring(img_str, dtype=dtype, count=height * width)
+                img = raw.reshape((height, width))
+                if imgtype == "color":
+                    img = cv2.cvtColor(img, cv2.COLOR_BAYER_RG2BGR)
+                if flip != 0:
+                    img = _rotate_image(img)
+                return img
+    return False
 
 
 def _rotate_image(img):
@@ -104,3 +112,12 @@ def _rotate_image(img):
     img = cv2.flip(img, 0)
 
     return img
+
+
+def _raw_qc(img_str, height, width):
+    # Divide the raw image string by the total pixels
+    ratio = len(img_str) / (height * width)
+    # The ratio should be 1 (8-bit) or 2 (16-bit)
+    if math.isclose(ratio, 1) or math.isclose(ratio, 2):
+        return True
+    return False
