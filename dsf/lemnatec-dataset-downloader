@@ -41,11 +41,11 @@ def main():
     # Query the database for image metadata and update the local metadata
     meta = lemnatec.query_images(db=db, metadata=meta, experiment=args.exp)
 
+    # Update the local metadata file
+    lemnatec.save_dataset(dataset_dir=args.outdir, metadata=meta)
+
     # Transfer the image data to the local directory
     lemnatec.transfer_images(metadata=meta, sftp=sftp, dataset_dir=args.outdir, config=config)
-
-    # Update the local metadata file
-    lemnatec.save_dataset(dataset_dir="ac_test", metadata=meta)
 
     # Close the SFTP connection
     sftp.close()
