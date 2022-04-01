@@ -3,6 +3,7 @@ import zipfile
 from datetime import datetime
 import numpy as np
 import cv2
+from tqdm import tqdm
 
 
 def transfer_images(metadata, sftp, dataset_dir, config):
@@ -19,7 +20,7 @@ def transfer_images(metadata, sftp, dataset_dir, config):
     :param dataset_dir: str
     :param config: dsf.data.lemnatec.config.Config
     """
-    for snapshot in metadata:
+    for snapshot in tqdm(metadata.keys()):
         # We only need to transfer images if the snapshot contains images
         if len(metadata[snapshot]["images"]) > 0:
             # Snapshot directory path
