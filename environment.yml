@@ -6,11 +6,13 @@ dependencies:
   - numpy
   - opencv
   - paramiko
-  - psycopg2
+  - psycopg
   - tqdm
   - nb_conda
   - jupyterlab
   - pytest
+  - flake8
+  - conda-forge::cryptography
 channels:
   - conda-forge
   - defaults
