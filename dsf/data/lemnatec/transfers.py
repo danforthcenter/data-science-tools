@@ -134,7 +134,7 @@ def _raw_qc(img_str, height, width, local_path, filename):
     # Divide the raw image string by the total pixels
     ratio = len(img_str) / (height * width)
     # The ratio should be 1 (8-bit) or 2 (16-bit)
-    if not math.isclose(ratio, 1) or not math.isclose(ratio, 2):
+    if not (math.isclose(ratio, 1) or math.isclose(ratio, 2)):
         print(f"Warning: the raw file {local_path} containing image {filename} is corrupted.", file=sys.stderr)
         return False
     return True
