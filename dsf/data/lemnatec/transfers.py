@@ -4,7 +4,7 @@ from datetime import datetime
 import numpy as np
 import cv2
 from tqdm import tqdm
-import math
+# import math
 import sys
 
 
@@ -98,21 +98,25 @@ def _convert_raw_to_png(raw, filename, height, width, dtype, imgtype, precision,
         with zf.open("data") as fp:
             # Raw image data as a string
             img_str = fp.read()
-            # Do a QC check before attempting to convert from raw
-            if _raw_qc(img_str=img_str, height=height, width=width, local_path=raw, filename=filename):
+            # Attempt to convert the image from a raw string into a linear array of the correct data type
+            try:
                 # Convert the image string into a linear array of the correct data type
                 raw = np.fromstring(img_str, dtype=dtype, count=height * width)
-                # Reshape the linear array into a 2-d array
-                img = raw.reshape((height, width))
-                # Rescale the image (if needed) to cover the gap between the datatype and data precision
-                img = _rescale_raw(raw_img=img, dtype=dtype, precision=precision, filename=filename)
-                if imgtype == "color":
-                    # Convert the Bayer filter raw image into color (BGR)
-                    img = cv2.cvtColor(img, cv2.COLOR_BAYER_RG2BGR)
-                if flip != 0:
-                    # Rotate and flip the image if needed
-                    img = _rotate_image(img)
-                return img
+            except ValueError:
+                print(f"Warning: the raw file {raw} containing image {filename} is corrupted.", file=sys.stderr)
+                return False
+            # Reshape the linear array into a 2-d array
+            img = raw.reshape((height, width))
+            # Rescale the image (if needed) to cover the gap between the datatype and data precision
+            img = _rescale_raw(raw_img=img, dtype=dtype, precision=precision, filename=filename)
+            if imgtype == "color":
+                # Convert the Bayer filter raw image into color (BGR)
+                img = cv2.cvtColor(img, cv2.COLOR_BAYER_RG2BGR)
+            if flip != 0:
+                # Rotate and flip the image if needed
+                img = _rotate_image(img)
+            return img
+    print(f"Warning: the raw file {raw} containing image {filename} is corrupted.", file=sys.stderr)
     return False
 
 
@@ -130,14 +134,14 @@ def _rotate_image(img):
     return img
 
 
-def _raw_qc(img_str, height, width, local_path, filename):
-    # Divide the raw image string by the total pixels
-    ratio = len(img_str) / (height * width)
-    # The ratio should be 1 (8-bit) or 2 (16-bit)
-    if not (math.isclose(ratio, 1) or math.isclose(ratio, 2)):
-        print(f"Warning: the raw file {local_path} containing image {filename} is corrupted.", file=sys.stderr)
-        return False
-    return True
+# def _raw_qc(img_str, height, width, local_path, filename):
+#     # Divide the raw image string by the total pixels
+#     ratio = len(img_str) / (height * width)
+#     # The ratio should be 1 (8-bit) or 2 (16-bit)
+#     if not (math.isclose(ratio, 1) or math.isclose(ratio, 2)):
+#         print(f"Warning: the raw file {local_path} containing image {filename} is corrupted.", file=sys.stderr)
+#         return False
+#     return True
 
 
 def _rescale_raw(raw_img, dtype, precision, filename):
