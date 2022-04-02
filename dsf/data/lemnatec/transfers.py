@@ -99,7 +99,7 @@ def _convert_raw_to_png(raw, filename, height, width, dtype, imgtype, precision,
             # Raw image data as a string
             img_str = fp.read()
             # Do a QC check before attempting to convert from raw
-            if _raw_qc(img_str=img_str, height=height, width=width, precision=precision, local_path=raw, filename=filename):
+            if _raw_qc(img_str=img_str, height=height, width=width, local_path=raw, filename=filename):
                 # Convert the image string into a linear array of the correct data type
                 raw = np.fromstring(img_str, dtype=dtype, count=height * width)
                 # Reshape the linear array into a 2-d array
