@@ -9,6 +9,7 @@ class Config:
     password: str
     hostname: str
     dataformat: dict
+    metadata: dict
     database: str = ""
 
 
@@ -31,5 +32,6 @@ def load_config(filename: str, database: str) -> Config:
                         password=settings["password"],
                         hostname=settings["hostname"],
                         dataformat=settings["dataformat"],
+                        metadata=settings["metadata"],
                         database=database)
         return config

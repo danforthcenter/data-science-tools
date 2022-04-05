@@ -1,4 +1,5 @@
 from copy import deepcopy
+import re
 
 
 def query_snapshots(db, metadata, experiment):
@@ -40,13 +41,14 @@ def query_snapshots(db, metadata, experiment):
     return meta
 
 
-def query_images(db, metadata, experiment):
+def query_images(db, metadata, experiment, config):
     """Query the database to retrieve all image records.
 
     Keyword arguments:
     db = Database cursor object.
     metadata = Dataset metadata.
     experiment = Experiment/Measurement label.
+    config = Instance of the class Config.
 
     Returns:
     meta = Updated dataset metadata
@@ -54,6 +56,7 @@ def query_images(db, metadata, experiment):
     :param db: psycopg2.extras.DictCursor
     :param metadata: dict
     :param experiment: str
+    :param config: dsf.data.lemnatec.config.Config
     :return meta: dict
     """
     # Make a deep copy of the input dictionary
@@ -78,4 +81,15 @@ def query_images(db, metadata, experiment):
                     "width": row["width"],
                     "height": row["height"]
                 }
+                camera_meta = _parse_camera_label(config=config, camera_label=row["camera_label"])
+                meta[snapshot_id]["images"][image_name].update(camera_meta)
     return meta
+
+
+def _parse_camera_label(config, camera_label):
+    camera_meta = {}
+    for term in config.metadata:
+        match = re.search(config.metadata[term], camera_label)
+        if match is not None:
+            camera_meta[term] = match.groups()[0]
+    return camera_meta
