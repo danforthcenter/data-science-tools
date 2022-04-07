@@ -89,7 +89,7 @@ def query_images(db, metadata, experiment, config):
 def _parse_camera_label(config, camera_label):
     camera_meta = {}
     for term in config.metadata:
-        match = re.search(config.metadata[term], camera_label)
+        match = re.search(config.metadata[term], camera_label, flags=re.IGNORECASE)
         if match is not None:
             camera_meta[term] = match.groups()[0]
     return camera_meta
