@@ -22,25 +22,26 @@ def transfer_images(metadata, sftp, dataset_dir, config):
     :param dataset_dir: str
     :param config: dsf.data.lemnatec.config.Config
     """
-    for snapshot in tqdm(metadata.keys()):
+    for snapshot in tqdm(metadata["snapshots"].keys()):
         # We only need to transfer images if the snapshot contains images
-        if len(metadata[snapshot]["images"]) > 0:
+        if len(metadata["snapshots"][snapshot]["images"]) > 0:
             # Snapshot directory path
-            snapshot_date = datetime.strptime(metadata[snapshot]["timestamp"], "%Y-%m-%d_%H:%M:%S.%f").strftime("%Y-%m-%d")
+            snapshot_date = datetime.strptime(metadata["snapshots"][snapshot]["timestamp"],
+                                              "%Y-%m-%d_%H:%M:%S.%f").strftime("%Y-%m-%d")
             snapshot_dir = os.path.join(dataset_dir, snapshot_date, snapshot)
             # Make the snapshot directory if it does not exist
             os.makedirs(snapshot_dir, exist_ok=True)
             # Loop over each image in the snapshot
-            for image in metadata[snapshot]["images"]:
+            for image in metadata["snapshots"][snapshot]["images"]:
                 # Image local path
                 imgpath = os.path.join(snapshot_dir, image)
                 # If the image does not exist we will transfer the raw image
                 if not os.path.exists(imgpath):
-                    raw_img = f"blob{metadata[snapshot]['images'][image]['raw_image_oid']}"
+                    raw_img = f"blob{metadata['snapshots'][snapshot]['images'][image]['raw_image_oid']}"
                     local_path = os.path.join(snapshot_dir, raw_img)
                     remote_path = os.path.join("/data/pgftp", config.database, snapshot_date, raw_img)
                     _transfer_raw_image(sftp=sftp, remote_path=remote_path, local_path=local_path)
-                    img_metadata = metadata[snapshot]["images"][image]
+                    img_metadata = metadata["snapshots"][snapshot]["images"][image]
                     img = _convert_raw_to_png(raw=local_path, filename=image,
                                               height=img_metadata["height"], width=img_metadata["width"],
                                               dtype=config.dataformat[img_metadata["dataformat"]]["datatype"],
