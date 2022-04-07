@@ -30,7 +30,7 @@ def main():
     db = lemnatec.open_database_connection(config=config)
 
     # Initialize the dataset directory if it does not exist
-    lemnatec.init_dataset(dataset_dir=args.outdir)
+    lemnatec.init_dataset(dataset_dir=args.outdir, config=config)
 
     # Load the dataset metadata
     meta = lemnatec.load_dataset(dataset_dir=args.outdir)
