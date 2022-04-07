@@ -21,7 +21,7 @@ def main():
     args = options()
 
     # Read the database connetion configuration file
-    config = lemnatec.load_config(filename=args.config, database=args.db)
+    config = lemnatec.load_config(filename=args.config, database=args.db, experiment=args.exp)
 
     # Open an SFTP connection to the database server
     sftp = lemnatec.open_sftp_connection(config=config)
@@ -36,10 +36,10 @@ def main():
     meta = lemnatec.load_dataset(dataset_dir=args.outdir)
 
     # Query the database for snapshot metadata and update the local metadata
-    meta = lemnatec.query_snapshots(db=db, metadata=meta, experiment=args.exp)
+    meta = lemnatec.query_snapshots(db=db, metadata=meta, experiment=config.experiment)
 
     # Query the database for image metadata and update the local metadata
-    meta = lemnatec.query_images(db=db, metadata=meta, experiment=args.exp, config=config)
+    meta = lemnatec.query_images(db=db, metadata=meta, experiment=config.experiment, config=config)
 
     # Update the local metadata file
     lemnatec.save_dataset(dataset_dir=args.outdir, metadata=meta)

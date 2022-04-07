@@ -11,9 +11,10 @@ class Config:
     dataformat: dict
     metadata: dict
     database: str = ""
+    experiment: str = ""
 
 
-def load_config(filename: str, database: str) -> Config:
+def load_config(filename: str, database: str, experiment: str) -> Config:
     """Load configuration settings from a JSON file.
 
     Keyword arguments:
@@ -33,5 +34,6 @@ def load_config(filename: str, database: str) -> Config:
                         hostname=settings["hostname"],
                         dataformat=settings["dataformat"],
                         metadata=settings["metadata"],
-                        database=database)
+                        database=database,
+                        experiment=experiment)
         return config

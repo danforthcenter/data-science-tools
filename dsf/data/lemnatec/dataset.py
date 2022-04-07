@@ -2,18 +2,27 @@ import os
 import json
 
 
-def init_dataset(dataset_dir):
+def init_dataset(dataset_dir, config):
     """Initialize the dataset layout.
 
     Keyword arguments:
     dataset_dir = Dataset directory path.
+    config = Instance of the class Config.
 
     :param dataset_dir: str
+    :param config: dsf.data.lemnatec.config.Config
     """
     # Make the dataset directory if it does not exist
     os.makedirs(dataset_dir, exist_ok=True)
     # Dataset metadata
-    metadata = {}
+    metadata = {
+        "dataset": {
+            "hostname": config.hostname,
+            "database": config.database,
+            "experiment": config.experiment
+        },
+        "snapshots": {}
+    }
     # Dataset metadata file
     metadata_file = os.path.join(dataset_dir, "metadata.json")
     # If the metadata file does not exist create an empty JSON file

@@ -26,8 +26,8 @@ def query_snapshots(db, metadata, experiment):
     for row in db:
         snapshot = f"snapshot{row['id']}"
         # If the snapshot has not been recorded in the dataset metadata add an empty record
-        if snapshot not in metadata:
-            meta[snapshot] = {
+        if snapshot not in metadata["snapshots"]:
+            meta["snapshots"][snapshot] = {
                 "barcode": row["id_tag"],
                 "cartag": row["car_tag"],
                 "timestamp": row["time_stamp"].strftime("%Y-%m-%d_%H:%M:%S.%f"),
@@ -67,11 +67,11 @@ def query_images(db, metadata, experiment, config):
     for row in db:
         # If the image snapshot ID is in metadata then it belongs in this dataset
         snapshot_id = f"snapshot{row['snapshot_id']}"
-        if snapshot_id in metadata:
+        if snapshot_id in metadata["snapshots"]:
             # Construct the image filename
             image_name = f"{row['camera_label']}_{row['tiled_image_id']}_{row['frame']}.png"
-            if image_name not in metadata[snapshot_id]["images"]:
-                meta[snapshot_id]["images"][image_name] = {
+            if image_name not in metadata["snapshots"][snapshot_id]["images"]:
+                meta["snapshots"][snapshot_id]["images"][image_name] = {
                     "camera_label": row["camera_label"],
                     "tiled_image_id": row["tiled_image_id"],
                     "frame": row["frame"],
@@ -82,7 +82,7 @@ def query_images(db, metadata, experiment, config):
                     "height": row["height"]
                 }
                 camera_meta = _parse_camera_label(config=config, camera_label=row["camera_label"])
-                meta[snapshot_id]["images"][image_name].update(camera_meta)
+                meta["snapshots"][snapshot_id]["images"][image_name].update(camera_meta)
     return meta
 
 
