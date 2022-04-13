@@ -1,5 +1,7 @@
+import os
 from copy import deepcopy
 import re
+from datetime import datetime
 
 
 def query_snapshots(db, metadata, experiment):
@@ -68,8 +70,12 @@ def query_images(db, metadata, experiment, config):
         # If the image snapshot ID is in metadata then it belongs in this dataset
         snapshot_id = f"snapshot{row['snapshot_id']}"
         if snapshot_id in metadata["snapshots"]:
+            # Snapshot directory path
+            snapshot_date = datetime.strptime(metadata["snapshots"][snapshot_id]["timestamp"],
+                                              "%Y-%m-%d_%H:%M:%S.%f").strftime("%Y-%m-%d")
             # Construct the image filename
-            image_name = f"{row['camera_label']}_{row['tiled_image_id']}_{row['frame']}.png"
+            image_name = os.path.join(snapshot_date, snapshot_id,
+                                      f"{row['camera_label']}_{row['tiled_image_id']}_{row['frame']}.png")
             if image_name not in metadata["snapshots"][snapshot_id]["images"]:
                 meta["snapshots"][snapshot_id]["images"][image_name] = {
                     "camera_label": row["camera_label"],
