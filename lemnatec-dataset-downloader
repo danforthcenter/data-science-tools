@@ -36,7 +36,7 @@ def main():
     meta = lemnatec.load_dataset(dataset_dir=args.outdir)
 
     # Query the database for snapshot metadata and update the local metadata
-    meta = lemnatec.query_snapshots(db=db, metadata=meta, experiment=config.experiment)
+    meta = lemnatec.query_snapshots(db=db, metadata=meta, experiment=config.experiment, config=config)
 
     # Query the database for image metadata and update the local metadata
     meta = lemnatec.query_images(db=db, metadata=meta, experiment=config.experiment, config=config)
