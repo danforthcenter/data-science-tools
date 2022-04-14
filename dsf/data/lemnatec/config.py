@@ -1,8 +1,6 @@
 import json
 from dataclasses import dataclass
 
-from importlib_metadata import metadata
-
 
 @dataclass
 class Config:
