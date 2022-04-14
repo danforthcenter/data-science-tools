@@ -1,6 +1,8 @@
 import json
 from dataclasses import dataclass
 
+from importlib_metadata import metadata
+
 
 @dataclass
 class Config:
@@ -10,6 +12,7 @@ class Config:
     hostname: str
     dataformat: dict
     metadata: dict
+    timezone: str
     database: str = ""
     experiment: str = ""
 
@@ -34,6 +37,7 @@ def load_config(filename: str, database: str, experiment: str) -> Config:
                         hostname=settings["hostname"],
                         dataformat=settings["dataformat"],
                         metadata=settings["metadata"],
+                        metadata=settings["timezone"],
                         database=database,
                         experiment=experiment)
         return config
