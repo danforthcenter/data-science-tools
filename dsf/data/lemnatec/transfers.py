@@ -20,33 +20,29 @@ def transfer_images(metadata, sftp, dataset_dir, config):
     :param dataset_dir: str
     :param config: dsf.data.lemnatec.config.Config
     """
-    for snapshot in tqdm(metadata["snapshots"].keys()):
-        # We only need to transfer images if the snapshot contains images
-        if len(metadata["snapshots"][snapshot]["images"]) > 0:
-            # Loop over each image in the snapshot
-            for image in metadata["snapshots"][snapshot]["images"]:
-                rel_path, filename = os.path.split(image)
-                snapshot_dir = os.path.join(dataset_dir, rel_path)
-                # Make the snapshot directory if it does not exist
-                os.makedirs(snapshot_dir, exist_ok=True)
-                # Image local path
-                imgpath = os.path.join(snapshot_dir, image)
-                # If the image does not exist we will transfer the raw image
-                if not os.path.exists(imgpath):
-                    raw_img = f"blob{metadata['snapshots'][snapshot]['images'][image]['raw_image_oid']}"
-                    local_path = os.path.join(snapshot_dir, raw_img)
-                    remote_path = os.path.join("/data/pgftp", config.database, rel_path, raw_img)
-                    _transfer_raw_image(sftp=sftp, remote_path=remote_path, local_path=local_path)
-                    img_metadata = metadata["snapshots"][snapshot]["images"][image]
-                    img = _convert_raw_to_png(raw=local_path, filename=image,
-                                              height=img_metadata["height"], width=img_metadata["width"],
-                                              dtype=config.dataformat[img_metadata["dataformat"]]["datatype"],
-                                              imgtype=config.dataformat[img_metadata["dataformat"]]["imgtype"],
-                                              precision=config.dataformat[img_metadata["dataformat"]]["bit-precision"],
-                                              flip=img_metadata["rotate_flip_type"])
-                    if img is not False:
-                        cv2.imwrite(imgpath, img)
-                        os.remove(local_path)
+    for image in tqdm(metadata["images"].keys()):
+        rel_path, filename = os.path.split(image)
+        snapshot_dir = os.path.join(dataset_dir, rel_path)
+        # Make the snapshot directory if it does not exist
+        os.makedirs(snapshot_dir, exist_ok=True)
+        # Image local path
+        imgpath = os.path.join(snapshot_dir, image)
+        # If the image does not exist we will transfer the raw image
+        if not os.path.exists(imgpath):
+            raw_img = f"blob{metadata['images'][image]['raw_image_oid']}"
+            local_path = os.path.join(snapshot_dir, raw_img)
+            remote_path = os.path.join("/data/pgftp", config.database, rel_path, raw_img)
+            _transfer_raw_image(sftp=sftp, remote_path=remote_path, local_path=local_path)
+            img_metadata = metadata["images"][image]
+            img = _convert_raw_to_png(raw=local_path, filename=image, height=img_metadata["height"],
+                                      width=img_metadata["width"],
+                                      dtype=config.dataformat[img_metadata["dataformat"]]["datatype"],
+                                      imgtype=config.dataformat[img_metadata["dataformat"]]["imgtype"],
+                                      precision=config.dataformat[img_metadata["dataformat"]]["bit-precision"],
+                                      flip=img_metadata["rotate_flip_type"])
+            if img is not False:
+                cv2.imwrite(imgpath, img)
+                os.remove(local_path)
 
 
 def _transfer_raw_image(sftp, remote_path, local_path):

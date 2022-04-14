@@ -21,7 +21,8 @@ def init_dataset(dataset_dir, config):
             "database": config.database,
             "experiment": config.experiment
         },
-        "snapshots": {}
+        "environment": {},
+        "images": {}
     }
     # Dataset metadata file
     metadata_file = os.path.join(dataset_dir, "metadata.json")

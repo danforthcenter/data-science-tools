@@ -1,7 +1,6 @@
 import os
 from copy import deepcopy
 import re
-from datetime import datetime
 
 
 def query_snapshots(db, metadata, experiment):
@@ -28,16 +27,15 @@ def query_snapshots(db, metadata, experiment):
     for row in db:
         snapshot = f"snapshot{row['id']}"
         # If the snapshot has not been recorded in the dataset metadata add an empty record
-        if snapshot not in metadata["snapshots"]:
-            meta["snapshots"][snapshot] = {
+        if snapshot not in metadata["environment"]:
+            meta["environment"][snapshot] = {
                 "barcode": row["id_tag"],
                 "cartag": row["car_tag"],
                 "timestamp": row["time_stamp"].strftime("%Y-%m-%d_%H:%M:%S.%f"),
                 "weight_before": row["weight_before"],
                 "weight_after": row["weight_after"],
                 "water_amount": row["water_amount"],
-                "completed": row["completed"],
-                "images": {}
+                "completed": row["completed"]
             }
 
     return meta
@@ -67,28 +65,30 @@ def query_images(db, metadata, experiment, config):
     db.execute("SELECT * FROM snapshot INNER JOIN tiled_image ON snapshot.id = tiled_image.snapshot_id INNER JOIN "
                "tile ON tiled_image.id = tile.tiled_image_id WHERE measurement_label = %s;", [experiment])
     for row in db:
-        # If the image snapshot ID is in metadata then it belongs in this dataset
+        # Construct the snapshot ID
         snapshot_id = f"snapshot{row['snapshot_id']}"
-        if snapshot_id in metadata["snapshots"]:
-            # Snapshot directory path
-            snapshot_date = datetime.strptime(metadata["snapshots"][snapshot_id]["timestamp"],
-                                              "%Y-%m-%d_%H:%M:%S.%f").strftime("%Y-%m-%d")
-            # Construct the image filename
-            image_name = os.path.join(snapshot_date, snapshot_id,
-                                      f"{row['camera_label']}_{row['tiled_image_id']}_{row['frame']}.png")
-            if image_name not in metadata["snapshots"][snapshot_id]["images"]:
-                meta["snapshots"][snapshot_id]["images"][image_name] = {
-                    "camera_label": row["camera_label"],
-                    "tiled_image_id": row["tiled_image_id"],
-                    "frame": row["frame"],
-                    "raw_image_oid": row["raw_image_oid"],
-                    "rotate_flip_type": row["rotate_flip_type"],
-                    "dataformat": str(row["dataformat"]),
-                    "width": row["width"],
-                    "height": row["height"]
-                }
-                camera_meta = _parse_camera_label(config=config, camera_label=row["camera_label"])
-                meta["snapshots"][snapshot_id]["images"][image_name].update(camera_meta)
+        # Snapshot date for the image path
+        snapshot_date = row["time_stamp"].strftime("%Y-%m-%d")
+        # Construct the image filename
+        image_name = os.path.join(snapshot_date, snapshot_id,
+                                  f"{row['camera_label']}_{row['tiled_image_id']}_{row['frame']}.png")
+        if image_name not in metadata["images"]:
+            meta["images"][image_name] = {
+                "snapshot": snapshot_id,
+                "barcode": row["id_tag"],
+                "cartag": row["car_tag"],
+                "timestamp": row["time_stamp"].strftime("%Y-%m-%d_%H:%M:%S.%f"),
+                "camera_label": row["camera_label"],
+                "tiled_image_id": row["tiled_image_id"],
+                "frame": row["frame"],
+                "raw_image_oid": row["raw_image_oid"],
+                "rotate_flip_type": row["rotate_flip_type"],
+                "dataformat": str(row["dataformat"]),
+                "width": row["width"],
+                "height": row["height"]
+            }
+            camera_meta = _parse_camera_label(config=config, camera_label=row["camera_label"])
+            meta["images"][image_name].update(camera_meta)
     return meta
 
 
