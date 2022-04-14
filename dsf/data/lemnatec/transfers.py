@@ -21,17 +21,25 @@ def transfer_images(metadata, sftp, dataset_dir, config):
     :param config: dsf.data.lemnatec.config.Config
     """
     for image in tqdm(metadata["images"].keys()):
+        # Spli the filename from the relative path:
+        # rel_path = date/snapshotID
         rel_path, filename = os.path.split(image)
+        # snapshot_dir = dataset/date/snapshotID
         snapshot_dir = os.path.join(dataset_dir, rel_path)
+        # snapshot date
+        snapshot_date, _ = os.path.split(rel_path)
         # Make the snapshot directory if it does not exist
         os.makedirs(snapshot_dir, exist_ok=True)
-        # Image local path
-        imgpath = os.path.join(snapshot_dir, image)
+        # Image local path, dataset/date/snapshotID/filename
+        imgpath = os.path.join(snapshot_dir, filename)
         # If the image does not exist we will transfer the raw image
         if not os.path.exists(imgpath):
+            # Raw image filename = blobID
             raw_img = f"blob{metadata['images'][image]['raw_image_oid']}"
+            # Local path to the raw image = dataset/date/snapshotID/blobID
             local_path = os.path.join(snapshot_dir, raw_img)
-            remote_path = os.path.join("/data/pgftp", config.database, rel_path, raw_img)
+            # Remote path to the raw image = /data/pgftp/database/date/blobID
+            remote_path = os.path.join("/data/pgftp", config.database, snapshot_date, raw_img)
             _transfer_raw_image(sftp=sftp, remote_path=remote_path, local_path=local_path)
             img_metadata = metadata["images"][image]
             img = _convert_raw_to_png(raw=local_path, filename=image, height=img_metadata["height"],
