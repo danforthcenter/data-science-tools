@@ -37,7 +37,7 @@ def load_config(filename: str, database: str, experiment: str) -> Config:
                         hostname=settings["hostname"],
                         dataformat=settings["dataformat"],
                         metadata=settings["metadata"],
-                        metadata=settings["timezone"],
+                        timezone=settings["timezone"],
                         database=database,
                         experiment=experiment)
         return config
