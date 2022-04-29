@@ -1,5 +1,6 @@
 import os
 import json
+from dsf import __version__ as version
 
 
 def init_dataset(dataset_dir, config):
@@ -19,7 +20,8 @@ def init_dataset(dataset_dir, config):
         "dataset": {
             "hostname": config.hostname,
             "database": config.database,
-            "experiment": config.experiment
+            "experiment": config.experiment,
+            "download-tool-version": version
         },
         "environment": {},
         "images": {}
