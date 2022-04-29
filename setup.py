@@ -7,6 +7,7 @@ https://github.com/pypa/sampleproject
 
 import setuptools
 from os import path
+import versioneer
 
 here = path.abspath(path.dirname(__file__))
 
@@ -15,7 +16,7 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 requirements_f = open('requirements.txt', 'r')
-dependencies = [ req for req in requirements_f.readlines() ]
+dependencies = [req for req in requirements_f.readlines()]
 
 setuptools.setup(
     name='dsf',
@@ -23,7 +24,7 @@ setuptools.setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version="1.0",
+    version=versioneer.get_version(),
 
     description='',
     long_description=long_description,
@@ -90,7 +91,8 @@ setuptools.setup(
     # },
     setup_requires=["pytest-runner"],
     tests_require=['pytest'],
-    scripts=["hyperbot-data-manager.py"]
+    scripts=["hyperbot-data-manager.py", "lemnatec-dataset-downloader"],
+    cmdclass=versioneer.get_cmdclass()
 
     # If there are data files included in your packages that need to be
     # installed, specify them here.  If using Python 2.6 or less, then these
