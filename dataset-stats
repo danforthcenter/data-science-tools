@@ -19,7 +19,7 @@ def main():
     args = options()
 
     # Load the dataset metadata
-    meta = lemnatec.load_dataset(dataset_dir=args.outdir)
+    meta = lemnatec.load_dataset(dataset_dir=args.dataset)
 
     # Number of snapshots
     snapshot_count = len(meta["environment"])
