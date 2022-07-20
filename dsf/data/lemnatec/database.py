@@ -26,7 +26,7 @@ def query_snapshots(db, metadata, experiment, config):
     meta = deepcopy(metadata)
 
     # Get local and UTC timezones
-    local_tz, utc_tz = _get_timezones(config=config)
+    utc_tz = ZoneInfo("UTC")
 
     # Query the database to retrieve all snapshot records for the given experiment
     db.execute("SELECT * FROM snapshot WHERE measurement_label = %s;", [experiment])
@@ -35,13 +35,14 @@ def query_snapshots(db, metadata, experiment, config):
         # If the snapshot has not been recorded in the dataset metadata add an empty record
         if snapshot not in metadata["environment"]:
             # Set local timezone
-            timestamp = row["time_stamp"].replace(tzinfo=local_tz)
+            timestamp = row["time_stamp"]
             # Convert from local time to UTC
             utc = timestamp.astimezone(utc_tz)
             meta["environment"][snapshot] = {
                 "barcode": row["id_tag"],
                 "cartag": row["car_tag"],
                 "timestamp": utc.strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
+                "local_time": timestamp.strftime("%Y-%m-%dT%H:%M:%S.%f%z"),
                 "weight_before": row["weight_before"],
                 "weight_after": row["weight_after"],
                 "water_amount": row["water_amount"],
@@ -72,15 +73,15 @@ def query_images(db, metadata, experiment, config):
     # Make a deep copy of the input dictionary
     meta = deepcopy(metadata)
 
-    # Get local and UTC timezones
-    local_tz, utc_tz = _get_timezones(config=config)
+    # Create a UTC timezone
+    utc_tz = ZoneInfo("UTC")
 
     # Query the database to retrieve all image records
     db.execute("SELECT * FROM snapshot INNER JOIN tiled_image ON snapshot.id = tiled_image.snapshot_id INNER JOIN "
                "tile ON tiled_image.id = tile.tiled_image_id WHERE measurement_label = %s;", [experiment])
     for row in db:
-        # Set local timezone
-        timestamp = row["time_stamp"].replace(tzinfo=local_tz)
+        # Get the local time and timezone
+        timestamp = row["time_stamp"]
         # Convert from local time to UTC
         utc = timestamp.astimezone(utc_tz)
         # Construct the snapshot ID
@@ -96,6 +97,7 @@ def query_images(db, metadata, experiment, config):
                 "barcode": row["id_tag"],
                 "cartag": row["car_tag"],
                 "timestamp": utc.strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
+                "local_time": timestamp.strftime("%Y-%m-%dT%H:%M:%S.%f%z"),
                 "camera_label": row["camera_label"],
                 "tiled_image_id": row["tiled_image_id"],
                 "frame": row["frame"],
@@ -117,10 +119,3 @@ def _parse_camera_label(config, camera_label):
         if match is not None:
             camera_meta[term] = match.groups()[0]
     return camera_meta
-
-
-def _get_timezones(config):
-    """"""
-    local_tz = ZoneInfo(config.timezone)
-    utc_tz = ZoneInfo("UTC")
-    return local_tz, utc_tz

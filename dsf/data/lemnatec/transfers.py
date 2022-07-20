@@ -4,6 +4,7 @@ import numpy as np
 import cv2
 from tqdm import tqdm
 import sys
+from datetime import datetime
 
 
 def transfer_images(metadata, sftp, dataset_dir, config):
@@ -27,7 +28,8 @@ def transfer_images(metadata, sftp, dataset_dir, config):
         # snapshot_dir = dataset/date/snapshotID
         snapshot_dir = os.path.join(dataset_dir, rel_path)
         # snapshot date
-        snapshot_date, _ = os.path.split(rel_path)
+        snapshot_date = datetime.strptime(metadata["images"][image]["local_time"],
+                                          "%Y-%m-%dT%H:%M:%S.%f%z").strftime("%Y-%m-%d")
         # Make the snapshot directory if it does not exist
         os.makedirs(snapshot_dir, exist_ok=True)
         # Image local path, dataset/date/snapshotID/filename
