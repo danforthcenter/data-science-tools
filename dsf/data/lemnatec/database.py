@@ -89,7 +89,7 @@ def query_images(db, metadata, experiment, config):
         # Snapshot date for the image path
         snapshot_date = utc.strftime("%Y-%m-%d")
         # Construct the image filename
-        image_name = os.path.join(snapshot_date, snapshot_id,
+        image_name = os.path.join(row["id_tag"], snapshot_date, snapshot_id,
                                   f"{row['camera_label']}_{row['tiled_image_id']}_{row['frame']}.png")
         if image_name not in metadata["images"]:
             meta["images"][image_name] = {

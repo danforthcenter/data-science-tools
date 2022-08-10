@@ -23,7 +23,7 @@ def transfer_images(metadata, sftp, dataset_dir, config):
     """
     for image in tqdm(metadata["images"].keys()):
         # Spli the filename from the relative path:
-        # rel_path = date/snapshotID
+        # rel_path = barcode/date/snapshotID
         rel_path, filename = os.path.split(image)
         # snapshot_dir = dataset/date/snapshotID
         snapshot_dir = os.path.join(dataset_dir, rel_path)
@@ -32,7 +32,7 @@ def transfer_images(metadata, sftp, dataset_dir, config):
                                           "%Y-%m-%dT%H:%M:%S.%f%z").strftime("%Y-%m-%d")
         # Make the snapshot directory if it does not exist
         os.makedirs(snapshot_dir, exist_ok=True)
-        # Image local path, dataset/date/snapshotID/filename
+        # Image local path, dataset/barcode/date/snapshotID/filename
         imgpath = os.path.join(snapshot_dir, filename)
         # If the image does not exist we will transfer the raw image
         if not os.path.exists(imgpath):
