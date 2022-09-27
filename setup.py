@@ -89,7 +89,7 @@ setuptools.setup(
     # },
     setup_requires=["pytest-runner"],
     tests_require=['pytest'],
-    scripts=["hyperbot-data-manager.py", "lemnatec-dataset-downloader"],
+    scripts=["hyperbot-data-manager.py", "lemnatec-dataset-downloader", "dataset-stats", "dataset-qc"],
     cmdclass=versioneer.get_cmdclass()
 
     # If there are data files included in your packages that need to be
