@@ -36,8 +36,8 @@ def main():
     start_date = dates[0].date().strftime("%Y-%m-%d")
     end_date = dates[-1].date().strftime("%Y-%m-%d")
 
-    print("Start Date\tEnd Date\tTotal Snapshots\tTotal Images")
-    print("\t".join(map(str, [start_date, end_date, snapshot_count, image_count])))
+    print("start_date end_date snapshots images")
+    print(" ".join(map(str, [start_date, end_date, snapshot_count, image_count])))
 
 
 if __name__ == "__main__":
