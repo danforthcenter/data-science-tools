@@ -47,7 +47,7 @@ def main():
     }
     for img in meta["images"]:
         imgtype = meta["images"][img].get("imgtype")
-        imgtype = imgtype.toupper()
+        imgtype = imgtype.upper()
         camera = meta["images"][img].get("camera")
         stats[f"{imgtype}-{camera}"]["total"] += 1
         if not os.path.exists(os.path.join(args.dataset, img)):
