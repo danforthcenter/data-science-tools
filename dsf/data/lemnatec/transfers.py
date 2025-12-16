@@ -48,6 +48,7 @@ def transfer_images(metadata, sftp, dataset_dir, config):
                                       width=img_metadata["width"],
                                       dtype=config.dataformat[img_metadata["dataformat"]]["datatype"],
                                       imgtype=config.dataformat[img_metadata["dataformat"]]["imgtype"],
+                                      bayertype=img_metadata["dataformat"],
                                       precision=config.dataformat[img_metadata["dataformat"]]["bit-precision"],
                                       flip=img_metadata["rotate_flip_type"])
             if img is not False:
@@ -73,7 +74,7 @@ def _transfer_raw_image(sftp, remote_path, local_path):
         print(f"I/O error({e.errno}): {e.strerror}. Offending file: {remote_path}", file=sys.stderr)
 
 
-def _convert_raw_to_png(raw, filename, height, width, dtype, imgtype, precision, flip):
+def _convert_raw_to_png(raw, filename, height, width, dtype, imgtype, bayertype, precision, flip):
     """Convert the raw image to PNG format.
 
     Keyword arguments:
@@ -81,16 +82,18 @@ def _convert_raw_to_png(raw, filename, height, width, dtype, imgtype, precision,
     filename = image filename
     height = height of the image
     width = width of the image
+    imgtype = image data type
+    bayertype = image data format, selects which cv2 constant to use for conversion
     precision = precision (bits) of the raw image values
-    dtype = image data type
     flip = flag indicating whether to rotate and flip the image or not
 
     :param raw: str
     :param filename: str
     :param height: int
     :param width: int
+    :param imgtype: str
+    :param bayertype: str
     :param precision: int
-    :param dtype: str
     :param flip: int
     """
     # Is the file a zip file?
@@ -113,8 +116,13 @@ def _convert_raw_to_png(raw, filename, height, width, dtype, imgtype, precision,
             # Rescale the image (if needed) to cover the gap between the datatype and data precision
             img = _rescale_raw(raw_img=img, dtype=dtype, precision=precision, filename=filename)
             if imgtype == "color":
-                # Convert the Bayer filter raw image into color (BGR)
-                img = cv2.cvtColor(img, cv2.COLOR_BAYER_RG2BGR)
+                if bayertype == "1":
+                    # Convert the Bayer filter raw image into color (BGR)
+                    # Lemnatech's datatype 1 is Bayer BG, we use cv2.COLOR_BAYER_RG2BGR because we want RGB
+                    img = cv2.cvtColor(img, cv2.COLOR_BAYER_RG2BGR)
+                elif bayertype == "10":
+                    # Lemnatech's datatype 10 is Bayer RG, we use cv2.COLOR_BAYER_BG2BGR because we want RGB
+                    img = cv2.cvtColor(img, cv2.COLOR_BAYER_BG2BGR)
             if flip != 0:
                 # Rotate and flip the image if needed
                 img = _rotate_image(img)
