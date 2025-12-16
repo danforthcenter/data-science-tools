@@ -118,10 +118,8 @@ def _convert_raw_to_png(raw, filename, height, width, dtype, imgtype, bayertype,
             if imgtype == "color":
                 if bayertype == "1":
                     # Convert the Bayer filter raw image into color (BGR)
-                    # Lemnatech's datatype 1 is Bayer BG, we use cv2.COLOR_BAYER_RG2BGR because we want RGB
                     img = cv2.cvtColor(img, cv2.COLOR_BAYER_RG2BGR)
                 elif bayertype == "10":
-                    # Lemnatech's datatype 10 is Bayer RG, we use cv2.COLOR_BAYER_BG2BGR because we want RGB
                     img = cv2.cvtColor(img, cv2.COLOR_BAYER_BG2BGR)
             if flip != 0:
                 # Rotate and flip the image if needed
