@@ -82,7 +82,8 @@ def _convert_raw_to_png(raw, filename, height, width, dtype, imgtype, bayertype,
     filename = image filename
     height = height of the image
     width = width of the image
-    imgtype = image data type
+    dtype = data type
+    imgtype = image type
     bayertype = image data format, selects which cv2 constant to use for conversion
     precision = precision (bits) of the raw image values
     flip = flag indicating whether to rotate and flip the image or not
@@ -91,6 +92,7 @@ def _convert_raw_to_png(raw, filename, height, width, dtype, imgtype, bayertype,
     :param filename: str
     :param height: int
     :param width: int
+    :param dtype: str
     :param imgtype: str
     :param bayertype: str
     :param precision: int
