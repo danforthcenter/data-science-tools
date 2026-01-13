@@ -109,7 +109,7 @@ def _convert_raw_to_png(raw, filename, height, width, dtype, imgtype, bayertype,
             # Attempt to convert the image from a raw string into a linear array of the correct data type
             try:
                 # Convert the image string into a linear array of the correct data type
-                raw = np.fromstring(img_str, dtype=dtype, count=height * width)
+                raw = np.frombuffer(img_str, dtype=dtype, count=height * width)
             except ValueError:
                 print(f"Warning: the raw file {raw} containing image {filename} is corrupted.", file=sys.stderr)
                 return False
